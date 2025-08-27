@@ -1,13 +1,13 @@
 import ox.*
-import sttp.tapir.server.netty.sync.NettySyncServer
 import sttp.tapir.*
-import sttp.model.Header
-import sttp.model.MediaType
+import sttp.tapir.files.*
+import sttp.model.*
+
+import sttp.tapir.server.netty.sync.NettySyncServer
 
 import funlearn.ui
 import funlearn.model.Card
-import sttp.tapir.server.netty.NettyConfig
-import sttp.tapir.server.netty.sync.NettySyncServerOptions
+
 
 object Main extends OxApp:
 
@@ -66,6 +66,7 @@ object Main extends OxApp:
     println(s"Access current session at: http://localhost:8080/session")
     NettySyncServer()
       .port(8080)
+      .addEndpoint(staticFilesGetServerEndpoint("static")("static"))
       .addEndpoints(List(
         indexEndpoint,
         passCurrentCardEndpoint,
