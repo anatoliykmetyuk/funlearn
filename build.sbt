@@ -15,6 +15,7 @@ lazy val rootProject = (project in file(".")).settings(
       "ch.qos.logback" % "logback-classic" % "1.5.18",
       "com.augustnagro" %% "magnum" % "1.3.0",
       "org.xerial" % "sqlite-jdbc" % "3.50.3.0",
+      "com.zaxxer" % "HikariCP" % "7.0.2",
     )
   )
 )

@@ -61,6 +61,7 @@ alwaysApply: true
   - You believe an architectural shift is warranted (propose it first).
   - The diagram/prompt omits an essential behavior, field, or flow.
 - Keep questions **short and specific**. Offer **one conservative default** and **one alternative** if helpful.
+- In case you need to use a library to implement a feature but are unsure how to use it exactly - use the tool context7 to find out the exact usage.
 
 ## Delivery format
 - **No bureaucracy.**

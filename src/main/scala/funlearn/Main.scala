@@ -5,8 +5,10 @@ import sttp.model.*
 
 import sttp.tapir.server.netty.sync.NettySyncServer
 
-import funlearn.ui
+import funlearn.html
+import funlearn.endpoints.serverDeckEndpoint
 import funlearn.model.Card
+import funlearn.model.Deck
 
 
 object Main extends OxApp:
@@ -35,7 +37,7 @@ object Main extends OxApp:
     .get.in("session").out(stringBody)
     .out(header(Header.contentType(MediaType.TextHtml)))
     .handleSuccess:
-      _ => ui.session(dueCards.head, dueCards.length).toString
+      _ => html.session(dueCards.head, dueCards.length).toString
 
   val passCurrentCardEndpoint = endpoint
     .post.in("session" / "pass").out(stringBody).errorOut(stringBody)
@@ -45,10 +47,10 @@ object Main extends OxApp:
         case Nil => Left("Error: No cards remaining")
         case current :: next :: xs =>
           dueCards = next :: xs
-          Right(ui.session(next, dueCards.length).toString)
+          Right(html.session(next, dueCards.length).toString)
         case current :: Nil =>
           dueCards = Nil
-          Right(ui.congratulations().toString)
+          Right(html.congratulations().toString)
 
   val lapseCurrentCardEndpoint = endpoint
     .post.in("session" / "lapse").out(stringBody).errorOut(stringBody)
@@ -58,19 +60,21 @@ object Main extends OxApp:
         case Nil => Left("Error: No cards remaining")
         case current :: next :: xs =>
           dueCards = (next :: xs) :+ current
-          Right(ui.session(next, dueCards.length).toString)
+          Right(html.session(next, dueCards.length).toString)
         case current :: Nil =>
-          Right(ui.session(current, dueCards.length).toString)
+          Right(html.session(current, dueCards.length).toString)
 
   override def run(args: Vector[String])(using Ox): ExitCode =
     println(s"Access current session at: http://localhost:8080/session")
+    println(s"Access decks at: http://localhost:8080/decks")
     NettySyncServer()
       .port(8080)
       .addEndpoint(staticFilesGetServerEndpoint("static")("static"))
       .addEndpoints(List(
         indexEndpoint,
         passCurrentCardEndpoint,
-        lapseCurrentCardEndpoint
+        lapseCurrentCardEndpoint,
+        serverDeckEndpoint,
       ))
       .startAndWait()
     ExitCode.Success

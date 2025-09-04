@@ -1,4 +1,4 @@
-package funlearn.ui
+package funlearn.html
 
 import scalatags.Text.all.*
 import scalatags.Text.tags2.{ title as _, attr as _, * }
