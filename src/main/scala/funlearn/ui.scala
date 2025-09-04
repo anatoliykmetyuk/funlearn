@@ -19,7 +19,7 @@ def layout(payload: Frag*) =
       script(src := "https://cdn.jsdelivr.net/npm/htmx.org@2.0.6/dist/htmx.min.js"),
       link(rel := "stylesheet", href := "/static/styles.css"),
     ),
-    body(
+    body(`class` := "container")(
       payload
     )
   )
@@ -39,7 +39,7 @@ def session(currentCard: Card, remainingCards: Int) = layout(
     )
   ),
 
-  section(`class` := "rating-buttons")(
+  section(`class` := "grid")(
     button(
       hx.post := "/session/lapse",
       hx.target := "body"
@@ -50,7 +50,7 @@ def session(currentCard: Card, remainingCards: Int) = layout(
     )("Pass")
   ),
 
-  section(`class` := "reveal-section")(
+  section(`class` := "")(
     button(onclick := """
       document.getElementById('card-back').hidden = false;
       this.hidden = true;
