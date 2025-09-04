@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "funlearn-metals": {
+      "url": "http://localhost:60490/sse"
+    }
+  }
+}

@@ -1,0 +1,69 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+
+## Architecture ground rules
+- The **existing codebase** and **this file** define the **style and code patterns**. Copy them exactly unless I explicitly tell you otherwise.
+- **All routes return HTML via Scalatags.** No JSON for the web app.
+- **Exceptions bubble.** Render the shared error page that prints the exception text.
+- **Layers (separated):**
+  - **Endpoints**: Tapir endpoint specs + wiring.
+  - **Service**: required. Endpoint logic lives here.
+  - **Views**: Scalatags HTML rendering.
+- **DB access:** Services may call **Magnum** directly. We don’t care about decoupling DB and service.
+- **State:** If you need intermediate state, **persist it in the DB**, never server memory. Clean it up when no longer needed.
+- **htmx:** Use it as needed. You’re free to use any features provided by existing libraries (including htmx). No extra constraints here.
+
+## Project structure
+- I decide how things are split and grouped horizontally. **Do not assume one-package-per-resource.**
+- Place new code **close to related code** as implied by the repository and my prompt/diagram.
+
+## How to work from a diagram (endpoints-first)
+- You will always receive:
+  - This file, which defines the style and rules you must follow.
+  - The **existing codebase**, which is the canonical example to copy from.
+  - A **diagram image** of the feature to implement.
+  - A **short prompt** with any additional details or clarifications.
+
+- Start from the **endpoints** in the diagram.
+  Each endpoint is **RESTful** and self-sufficient to identify an action.
+  An endpoint may render a **screen**, a **fragment**, or **both**.
+
+- For **each endpoint**:
+  1. Implement **Service** function(s) for the business logic (if any).
+  2. Endpoint logic = call Service, feed the result into **View**, return HTML.
+  3. If DB interaction is needed, do it from the **Service** using **Magnum**.
+  4. Derive screens/fragments from the endpoints; **not the other way around**.
+
+## Validation, errors, and responses
+- Follow the repo’s current validation approach. Keep it minimal and inline with the Service if nothing exists.
+- Don’t swallow exceptions. Let them bubble to the error page.
+- For partial updates or form errors, return the same view/fragment with inline error rendering following repo patterns.
+
+## Libraries and changes
+- **Do not introduce a new library** without **asking me first**.
+- If you see an **impedance mismatch** between the existing structure and the goal, you may **conceptualize** a more optimal alternative.
+  - **Do not implement it** without approval.
+  - Propose it and ask if I want to try it or stick with current patterns.
+- These guidelines are **read-only**. **Only change them if I directly request it.**
+
+## Conflicts and ambiguity
+- If the diagram or prompt conflicts with repo conventions, **ask me** what to do.
+- If something is missing or ambiguous in the diagram/prompt, **ask me** instead of guessing on core semantics.
+
+## Agent ↔ User interaction rules
+- **Default mode:** if the feature is straightforward and consistent with the repo style, **just implement it**.
+- **Ask me** when:
+  - There’s a conflict with repo conventions.
+  - A new dependency or library would help.
+  - You believe an architectural shift is warranted (propose it first).
+  - The diagram/prompt omits an essential behavior, field, or flow.
+- Keep questions **short and specific**. Offer **one conservative default** and **one alternative** if helpful.
+
+## Delivery format
+- **No bureaucracy.**
+  Do **not** include file tree diffs, full file contents, schema plans, test plans, rollbacks, or commit messages.
+- Just implement.
+- If I ask for a summary, give a **one-liner** only.
