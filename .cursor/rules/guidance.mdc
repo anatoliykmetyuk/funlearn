@@ -15,6 +15,7 @@ alwaysApply: true
 - **DB access:** Services may call **Magnum** directly. We don’t care about decoupling DB and service.
 - **State:** If you need intermediate state, **persist it in the DB**, never server memory. Clean it up when no longer needed.
 - **htmx:** Use it as needed. You’re free to use any features provided by existing libraries (including htmx). No extra constraints here.
+- **CSS:** Use the existing styles.css file. Do not use inline styles. No styling in HTML files.
 
 ## Project structure
 - I decide how things are split and grouped horizontally. **Do not assume one-package-per-resource.**
