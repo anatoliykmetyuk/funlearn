@@ -1,0 +1,12 @@
+/* Deck card layout */
+.deck-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.deck-edit-btn {
+  font-size: 0.8em;
+  padding: 0.2em 0.4em;
+  margin: 0;
+}

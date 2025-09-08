@@ -13,11 +13,9 @@ def decks(decks: List[Deck]) = layout(
     // Deck buttons
     section(`class` := "grid")(
       for deck <- decks yield
-        article(
-          header(
-            h3(deck.name),
-            button(`class` := "secondary")("✏️")
-          )
+        article(`class` := "deck-card")(
+          h3(deck.name),
+          button(`class` := "secondary deck-edit-btn")("✏️")
         )
     ),
 
