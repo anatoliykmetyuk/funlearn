@@ -6,10 +6,9 @@ import sttp.model.*
 import sttp.tapir.server.netty.sync.NettySyncServer
 
 import funlearn.html
-import funlearn.endpoints.serverDeckEndpoint
+import funlearn.endpoints.{serverDeckEndpoint, serverNewDeckEndpoint}
 import funlearn.model.Card
 import funlearn.model.Deck
-
 
 object Main extends OxApp:
 
@@ -75,6 +74,7 @@ object Main extends OxApp:
         passCurrentCardEndpoint,
         lapseCurrentCardEndpoint,
         serverDeckEndpoint,
+        serverNewDeckEndpoint,
       ))
       .startAndWait()
     ExitCode.Success
