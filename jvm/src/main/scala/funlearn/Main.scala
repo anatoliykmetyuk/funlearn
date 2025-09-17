@@ -68,7 +68,7 @@ object Main extends OxApp:
     println(s"Access decks at: http://localhost:8080/decks")
     NettySyncServer()
       .port(8080)
-      .addEndpoint(staticFilesGetServerEndpoint("static")("static"))
+      .addEndpoint(staticFilesGetServerEndpoint("static")("../static"))
       .addEndpoints(List(
         indexEndpoint,
         passCurrentCardEndpoint,

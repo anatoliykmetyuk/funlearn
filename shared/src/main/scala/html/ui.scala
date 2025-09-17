@@ -18,7 +18,7 @@ def layout(pageTitle: String)(payload: Frag*) =
       link(rel := "stylesheet", href := "https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"),
       script(src := "https://cdn.jsdelivr.net/npm/htmx.org@2.0.6/dist/htmx.min.js"),
       link(rel := "stylesheet", href := "/static/styles.css"),
-      script(src := "/static/script.js"),
+      script(src := "/static/funlearn-fastopt.js"),
     ),
     body(`class` := "container")(
       payload
