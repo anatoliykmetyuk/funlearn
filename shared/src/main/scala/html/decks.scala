@@ -2,8 +2,12 @@ package funlearn.html
 
 import scalatags.Text.all.*
 import scalatags.Text.tags2.{ title as _, attr as _, * }
+import org.scalajs.dom
 
 import funlearn.model.Deck
+import scala.scalajs.js.annotation.JSExportTopLevel
+import org.scalajs.dom.HTMLElement
+import org.scalajs.dom.Event
 
 
 def decks(decks: List[Deck]) = layout("Decks")(
@@ -44,20 +48,9 @@ def newDeck() = layout("Create New Deck")(
       fieldset(
         legend("Card Structure"),
 
-        div(`class` := "card-type-fields")(
-          // Hidden template for cloning
-          div(`class` := "card-type-field template", hidden)(
-            label("Key", `for` := "key_template"),
-            input(`type` := "text", id := "key_template", name := "keys[]", required),
+        div(`class` := "card-type-fields")(),
 
-            label("Prompt", `for` := "prompt_template"),
-            input(`type` := "text", id := "prompt_template", name := "prompts[]", required),
-
-            button(`type` := "button", `class` := "secondary", id := "remove-card-field")("➖ Remove Card Field"),
-          )
-        ),
-
-        button(`type` := "button", `class` := "secondary", id := "add-card-field")("➕ Add Card Field"),
+        button(`type` := "button", `class` := "secondary", id := "add-card-field", onclick := "addCardField()")("➕ Add Card Field"),
       ),
 
       section(
@@ -66,3 +59,27 @@ def newDeck() = layout("Create New Deck")(
     )
   )
 )
+
+@JSExportTopLevel("addCardField")
+def addCardField(): Unit =
+  val cardTypeFields = dom.document.querySelector(".card-type-fields")
+  val newField = cardTypeField()
+  cardTypeFields.appendChild(newField.render)
+
+@JSExportTopLevel("removeCardField")
+def removeCardField(btn: HTMLElement): Unit =
+  val cardTypeField = btn.closest(".card-type-field")
+  val cardTypeFields = cardTypeField.parentNode
+  cardTypeFields.removeChild(cardTypeField)
+
+def cardTypeField() =
+  import scalatags.JsDom.all._
+  div(`class` := "card-type-field")(
+    label("Key", `for` := "key"),
+    input(`type` := "text", id := "key", name := "keys[]", required),
+
+    label("Prompt", `for` := "prompt"),
+    input(`type` := "text", id := "prompt", name := "prompts[]", required),
+
+    button(`type` := "button", `class` := "secondary", onclick := "removeCardField(this)")("➖ Remove Card Field"),
+  )
