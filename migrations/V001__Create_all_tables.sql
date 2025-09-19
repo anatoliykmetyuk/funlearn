@@ -4,6 +4,7 @@
 CREATE TABLE decks (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
+    description TEXT NOT NULL,
     schema TEXT NOT NULL, -- JSON string
     record_name_key TEXT NOT NULL
 );

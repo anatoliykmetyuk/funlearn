@@ -15,7 +15,7 @@ object decks:
 
   def getAllDecks(): List[Deck] =
     connect(xa):
-      sql"SELECT id, name, schema, record_name_key FROM decks ORDER BY id"
+      sql"SELECT id, name, description, schema, record_name_key FROM decks ORDER BY id"
         .query[Deck]
         .run()
         .toList

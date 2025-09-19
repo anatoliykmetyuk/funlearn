@@ -45,6 +45,6 @@ val serverCreateDeckEndpoint = createDeckEndpoint
 
       // Schema is a JSON string formed from the keys and prompts
       val schema = upickle.default.write(schemaModel)
-      val deck = Deck(-1, name, schema, "default")
+      val deck = Deck(-1, name, description, schema, "default")
 
       html.newDeck().toString
