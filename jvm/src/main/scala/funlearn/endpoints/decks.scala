@@ -12,6 +12,7 @@ import funlearn.endpoints.Headers
 val decksEndpoint = endpoint
   .get.in("decks").out(stringBody)
   .out(header(Header.contentType(MediaType.TextHtml)))
+  .out(header(Headers.hxPushUrl, "/decks"))
 
 val newDecksEndoint = endpoint
   .get.in("decks" / "new").out(stringBody)

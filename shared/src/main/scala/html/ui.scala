@@ -21,6 +21,15 @@ def layout(pageTitle: String)(payload: Frag*) =
       script(src := "/static/funlearn-fastopt.js"),
     ),
     body(`class` := "container")(
+      header(`class` := "container")(
+        nav(
+          a(
+            hx.get := "/decks",
+            hx.target := "body",
+            `class` := "logo"
+          )(img(src := "/static/logo.png", alt := "FunLearn Logo"))
+        )
+      ),
       payload
     )
   )
