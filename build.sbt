@@ -18,7 +18,8 @@ lazy val funlearn = crossProject(JSPlatform, JVMPlatform).in(file("."))
       organization := "anatoliikmt",
       libraryDependencies ++= Seq(
         "com.lihaoyi" %%% "scalatags" % "0.13.1",  // https://javadoc.io/doc/com.lihaoyi/scalatags_3  https://com-lihaoyi.github.io/scalatags/
-        "org.scala-js" %%% "scalajs-dom" % "2.8.1"  // https://javadoc.io/doc/org.scala-js/scalajs-dom_sjs1_3
+        "org.scala-js" %%% "scalajs-dom" % "2.8.1",  // https://javadoc.io/doc/org.scala-js/scalajs-dom_sjs1_3
+        "com.lihaoyi" %%% "upickle" % "4.3.2"  // https://javadoc.io/doc/com.lihaoyi/upickle_3
       )
     )
   )

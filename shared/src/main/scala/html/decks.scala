@@ -34,7 +34,10 @@ def newDeck() = layout("Create New Deck")(
   main(
     h1("Create New Deck"),
 
-    form(action := "/decks", method := "POST")(
+    form(
+      hx.post := "/decks",
+      hx.target := "body"
+    )(
       fieldset(
         legend("Deck Information"),
 
