@@ -19,3 +19,13 @@ object decks:
         .query[Deck]
         .run()
         .toList
+
+  def createDeck(deck: Deck): Long =
+    connect(xa):
+      sql"""
+        INSERT INTO decks (name, description, schema, record_name_key)
+        VALUES (${deck.name}, ${deck.description}, ${deck.schema}, ${deck.recordNameKey})
+        RETURNING id
+      """
+        .returning[Long]
+        .run().head

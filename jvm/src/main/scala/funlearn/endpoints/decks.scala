@@ -39,12 +39,18 @@ val serverCreateDeckEndpoint = createDeckEndpoint
     (body: Seq[(String, String)]) =>
       val name = body.find(_._1 == "name").map(_._2).get
       val description = body.find(_._1 == "description").map(_._2).get
+      val labelKeyId = body.find(_._1 == "label_key").map(_._2).get
+      val labelKey = body.find(_._1 == s"keys[$labelKeyId]").map(_._2).get
+
       val keys = body.filter(_._1.startsWith("keys")).map(_._2)
       val prompts = body.filter(_._1.startsWith("prompts")).map(_._2)
       val schemaModel = keys.zip(prompts).map { case (k, p) => Map("name" -> k, "prompt" -> p) }
 
       // Schema is a JSON string formed from the keys and prompts
       val schema = upickle.default.write(schemaModel)
-      val deck = Deck(-1, name, description, schema, "default")
+      val deck = Deck(-1, name, description, schema, labelKey)
+
+      val deckId = service.decks.createDeck(deck)
+      println(s"Deck created, deckId: $deckId")
 
       html.newDeck().toString

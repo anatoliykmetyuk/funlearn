@@ -30,44 +30,48 @@ def decks(decks: List[Deck]) = layout("Decks")(
   )
 )
 
-def newDeck() = layout("Create New Deck")(
-  main(
-    h1("Create New Deck"),
+var decksFieldsCounter = 0
+def newDeck() =
+  decksFieldsCounter = 0
+  layout("Create New Deck")(
+    main(
+      h1("Create New Deck"),
 
-    form(
-      hx.post := "/decks",
-      hx.target := "body"
-    )(
-      fieldset(
-        legend("Deck Information"),
+      form(
+        hx.post := "/decks",
+        hx.target := "body"
+      )(
+        fieldset(
+          legend("Deck Information"),
 
-        label("Name", `for` := "name"),
-        input(`type` := "text", id := "name", name := "name", required),
+          label("Name", `for` := "name"),
+          input(`type` := "text", id := "name", name := "name", required),
 
-        label("Description", `for` := "description"),
-        textarea(id := "description", name := "description", rows := 3),
-      ),
+          label("Description", `for` := "description"),
+          textarea(id := "description", name := "description", rows := 3),
+        ),
 
-      fieldset(
-        legend("Card Structure"),
+        fieldset(
+          legend("Card Structure"),
 
-        div(`class` := "card-type-fields")(),
+          div(`class` := "card-type-fields")(),
 
-        button(`type` := "button", `class` := "secondary", id := "add-card-field", onclick := "addCardField()")("➕ Add Card Field"),
-      ),
+          button(`type` := "button", `class` := "secondary", id := "add-card-field", onclick := "addCardField()")("➕ Add Card Field"),
+        ),
 
-      section(
-        button(`type` := "submit", `class` := "primary")("➡️ Create Deck")
+        section(
+          button(`type` := "submit", `class` := "primary")("➡️ Create Deck")
+        )
       )
     )
   )
-)
 
 @JSExportTopLevel("addCardField")
 def addCardField(): Unit =
   val cardTypeFields = dom.document.querySelector(".card-type-fields")
-  val newField = cardTypeField()
+  val newField = cardTypeField(decksFieldsCounter, isLabelKey = cardTypeFields.children.length == 0)
   cardTypeFields.appendChild(newField.render)
+  decksFieldsCounter += 1
 
 @JSExportTopLevel("removeCardField")
 def removeCardField(btn: HTMLElement): Unit =
@@ -75,14 +79,19 @@ def removeCardField(btn: HTMLElement): Unit =
   val cardTypeFields = cardTypeField.parentNode
   cardTypeFields.removeChild(cardTypeField)
 
-def cardTypeField() =
+def cardTypeField(uid: Int, isLabelKey: Boolean = false) =
   import scalatags.JsDom.all._
   div(`class` := "card-type-field")(
     label("Key", `for` := "key"),
-    input(`type` := "text", id := "key", name := "keys[]", required),
+    input(`type` := "text", id := s"key-$uid", name := s"keys[$uid]", required),
 
     label("Prompt", `for` := "prompt"),
-    input(`type` := "text", id := "prompt", name := "prompts[]", required),
+    input(`type` := "text", id := s"prompt-$uid", name := s"prompts[$uid]", required),
+
+    div(`class` := "grid")(
+      label("Label key?", `for` := "label_key"),
+      input(`type` := "radio", id := s"label_key-$uid", name := s"label_key", value := s"$uid", if (isLabelKey) checked else ()),
+    ),
 
     button(`type` := "button", `class` := "secondary", onclick := "removeCardField(this)")("➖ Remove Card Field"),
   )
