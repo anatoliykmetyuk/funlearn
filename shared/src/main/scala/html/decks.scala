@@ -12,8 +12,6 @@ import org.scalajs.dom.Event
 
 def decks(decks: List[Deck]) = layout("Decks")(
   main(
-    h1("Decks"),
-
     // Deck buttons
     section(`class` := "grid")(
       for deck <- decks yield
@@ -35,8 +33,6 @@ def newDeck() =
   decksFieldsCounter = 0
   layout("Create New Deck")(
     main(
-      h1("Create New Deck"),
-
       form(
         hx.post := "/decks",
         hx.target := "body"

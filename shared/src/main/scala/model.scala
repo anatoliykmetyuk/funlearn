@@ -9,3 +9,11 @@ case class Deck(
   schema: String, // JSON string
   recordNameKey: String
 )
+
+case class CardType(
+  id: Long,
+  name: String,
+  deckId: Long,
+  frontTml: String,
+  backTml: String
+)

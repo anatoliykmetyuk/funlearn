@@ -30,6 +30,7 @@ def layout(pageTitle: String)(payload: Frag*) =
           )(img(src := "/static/logo.png", alt := "FunLearn Logo"))
         )
       ),
+      h1(pageTitle),
       payload
     )
   )

@@ -22,6 +22,7 @@ CREATE TABLE records (
 -- Card types table
 CREATE TABLE card_types (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
     deck_id INTEGER NOT NULL,
     front_tml TEXT NOT NULL, -- HTML template
     back_tml TEXT NOT NULL, -- HTML template

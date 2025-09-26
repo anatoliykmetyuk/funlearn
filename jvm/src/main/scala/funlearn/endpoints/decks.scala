@@ -4,7 +4,7 @@ import sttp.tapir.*
 import sttp.tapir.files.*
 import sttp.model.*
 
-import funlearn.model.Deck
+import funlearn.model.{ Deck, CardType }
 import funlearn.html
 import funlearn.service
 import funlearn.endpoints.Headers
@@ -53,4 +53,10 @@ val serverCreateDeckEndpoint = createDeckEndpoint
       val deckId = service.decks.createDeck(deck)
       println(s"Deck created, deckId: $deckId")
 
-      html.newDeck().toString
+      // Create the first card type
+      val cardType = CardType(-1, "Default", deckId, "", "")
+      val cardTypeId = service.cardTypes.createCardType(cardType)
+      val newCardType = service.cardTypes.getCardTypeById(cardTypeId)
+      println(s"Card type created: $newCardType")
+
+      // Return the edit page for the new card type, by redirecting the user to page /card_type/{id}/edit
