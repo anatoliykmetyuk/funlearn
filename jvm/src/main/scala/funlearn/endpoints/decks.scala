@@ -20,8 +20,9 @@ val newDecksEndoint = endpoint
   .out(header(Headers.hxPushUrl, "/decks/new"))
 
 val createDeckEndpoint = endpoint
-  .post.in("decks").in(formBody[Seq[(String, String)]]).out(stringBody)
-  .out(header(Header.contentType(MediaType.TextHtml)))
+  .post.in("decks").in(formBody[Seq[(String, String)]])
+  .out(header[String](HeaderNames.Location))
+  .out(statusCode(StatusCode.SeeOther))
 
 val serverDeckEndpoint = decksEndpoint
   .handleSuccess:
@@ -60,3 +61,4 @@ val serverCreateDeckEndpoint = createDeckEndpoint
       println(s"Card type created: $newCardType")
 
       // Return the edit page for the new card type, by redirecting the user to page /card_type/{id}/edit
+      s"/card_types/$cardTypeId/edit"

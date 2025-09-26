@@ -7,6 +7,7 @@ import funlearn.model.Card
 object hx:
   def get = attr("hx-get")
   def post = attr("hx-post")
+  def put = attr("hx-put")
   def target = attr("hx-target")
 
 def layout(pageTitle: String)(payload: Frag*) =
