@@ -62,3 +62,55 @@ val serverCreateDeckEndpoint = createDeckEndpoint
 
       // Return the edit page for the new card type, by redirecting the user to page /card_type/{id}/edit
       s"/card_types/$cardTypeId/edit"
+
+val deckDetailEndpoint = endpoint
+  .get.in("decks" / path[Long]).out(stringBody)
+  .out(header(Header.contentType(MediaType.TextHtml)))
+  .out(header[String](Headers.hxPushUrl))
+
+val editDeckEndpoint = endpoint
+  .get.in("decks" / path[Long] / "edit").out(stringBody)
+  .out(header(Header.contentType(MediaType.TextHtml)))
+  .out(header[String](Headers.hxPushUrl))
+
+val updateDeckEndpoint = endpoint
+  .patch.in("decks" / path[Long]).in(formBody[Seq[(String, String)]])
+  .out(header[String](HeaderNames.Location))
+  .out(statusCode(StatusCode.SeeOther))
+
+val deleteDeckEndpoint = endpoint
+  .delete.in("decks" / path[Long])
+  .out(header[String](HeaderNames.Location))
+  .out(statusCode(StatusCode.SeeOther))
+
+val serverDeckDetailEndpoint = deckDetailEndpoint
+  .handleSuccess:
+    (deckId: Long) =>
+      val deck = service.decks.getDeckById(deckId)
+      val cardTypes = service.cardTypes.getCardTypesByDeckId(deckId)
+      val body = html.deckDetail(deck, cardTypes).toString
+      (body, s"/decks/$deckId")
+
+val serverEditDeckEndpoint = editDeckEndpoint
+  .handleSuccess:
+    (deckId: Long) =>
+      val deck = service.decks.getDeckById(deckId)
+      val body = html.editDeck(deck).toString
+      (body, s"/decks/$deckId/edit")
+
+val serverUpdateDeckEndpoint = updateDeckEndpoint
+  .handleSuccess:
+    (deckId: Long, body: Seq[(String, String)]) =>
+      val name = body.find(_._1 == "name").map(_._2).get
+      val description = body.find(_._1 == "description").map(_._2).get
+
+      val originalDeck = service.decks.getDeckById(deckId)
+      val updatedDeck = originalDeck.copy(name = name, description = description)
+      service.decks.updateDeck(updatedDeck)
+      s"/decks/$deckId"
+
+val serverDeleteDeckEndpoint = deleteDeckEndpoint
+  .handleSuccess:
+    (deckId: Long) =>
+      service.decks.deleteDeck(deckId)
+      "/decks"

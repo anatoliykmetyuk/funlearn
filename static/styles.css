@@ -10,3 +10,8 @@
   padding: 0.2em 0.4em;
   margin: 0;
 }
+
+/* All anchor tags should have the finger cursor */
+a {
+  cursor: pointer;
+}

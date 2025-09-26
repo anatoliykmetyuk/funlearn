@@ -76,8 +76,16 @@ object Main extends OxApp:
         serverDeckEndpoint,
         serverNewDeckEndpoint,
         serverCreateDeckEndpoint,
+        serverDeckDetailEndpoint,
+        serverEditDeckEndpoint,
+        serverUpdateDeckEndpoint,
+        serverDeleteDeckEndpoint,
         serverEditCardTypeEndpoint,
         serverUpdateCardTypeEndpoint,
+        serverNewCardTypeEndpoint,
+        serverCardTypeDetailEndpoint,
+        serverCreateCardTypeEndpoint,
+        serverDeleteCardTypeEndpoint,
       ))
       .startAndWait()
     ExitCode.Success

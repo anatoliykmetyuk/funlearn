@@ -8,6 +8,8 @@ object hx:
   def get = attr("hx-get")
   def post = attr("hx-post")
   def put = attr("hx-put")
+  def patch = attr("hx-patch")
+  def delete = attr("hx-delete")
   def target = attr("hx-target")
 
 def layout(pageTitle: String)(payload: Frag*) =

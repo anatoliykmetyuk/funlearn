@@ -16,7 +16,7 @@ CREATE TABLE records (
     fields TEXT NOT NULL, -- JSON string
     flagged BOOLEAN NOT NULL DEFAULT 0,
     staged BOOLEAN NOT NULL DEFAULT 0,
-    FOREIGN KEY (deck_id) REFERENCES decks(id)
+    FOREIGN KEY (deck_id) REFERENCES decks(id) ON DELETE CASCADE
 );
 
 -- Card types table
@@ -26,7 +26,7 @@ CREATE TABLE card_types (
     deck_id INTEGER NOT NULL,
     front_tml TEXT NOT NULL, -- HTML template
     back_tml TEXT NOT NULL, -- HTML template
-    FOREIGN KEY (deck_id) REFERENCES decks(id)
+    FOREIGN KEY (deck_id) REFERENCES decks(id) ON DELETE CASCADE
 );
 
 -- Cards table
@@ -35,9 +35,9 @@ CREATE TABLE cards (
     record_id INTEGER NOT NULL,
     card_type_id INTEGER NOT NULL,
     deck_id INTEGER NOT NULL,
-    FOREIGN KEY (record_id) REFERENCES records(id),
-    FOREIGN KEY (card_type_id) REFERENCES card_types(id),
-    FOREIGN KEY (deck_id) REFERENCES decks(id)
+    FOREIGN KEY (record_id) REFERENCES records(id) ON DELETE CASCADE,
+    FOREIGN KEY (card_type_id) REFERENCES card_types(id) ON DELETE CASCADE,
+    FOREIGN KEY (deck_id) REFERENCES decks(id) ON DELETE CASCADE
 );
 
 -- Schedules table
@@ -47,6 +47,6 @@ CREATE TABLE schedules (
     next_rep TIMESTAMP NOT NULL,
     interval_sec INTEGER NOT NULL,
     ease REAL NOT NULL,
-    FOREIGN KEY (card_id) REFERENCES cards(id)
+    FOREIGN KEY (card_id) REFERENCES cards(id) ON DELETE CASCADE
 );
 
