@@ -36,18 +36,8 @@ val decks_POST = endpoint
   .out(statusCode(StatusCode.SeeOther))
   .handleSuccess:
     (body: Seq[(String, String)]) =>
-      val name = body.find(_._1 == "name").map(_._2).get
-      val description = body.find(_._1 == "description").map(_._2).get
-      val labelKeyId = body.find(_._1 == "label_key").map(_._2).get
-      val labelKey = body.find(_._1 == s"keys[$labelKeyId]").map(_._2).get
-
-      val keys = body.filter(_._1.startsWith("keys")).map(_._2)
-      val prompts = body.filter(_._1.startsWith("prompts")).map(_._2)
-      val schemaModel = keys.zip(prompts).map { case (k, p) => Map("name" -> k, "prompt" -> p) }
-
-      val cardTypeId = IMPL_decks_POST(name, description, labelKey, schemaModel)
-
-      // Return the edit page for the new card type, by redirecting the user to page /card_type/{id}/edit
+      val data = IMPL_decks_POST.mkData(body)
+      val cardTypeId = IMPL_decks_POST.impl(data)
       s"/card_types/$cardTypeId/edit"
 
 val decks_id_GET = endpoint
