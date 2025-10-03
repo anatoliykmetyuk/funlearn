@@ -1,4 +1,4 @@
-package funlearn.service
+package funlearn.db
 
 import com.augustnagro.magnum.*
 import funlearn.model.CardType

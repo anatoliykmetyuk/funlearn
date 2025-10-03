@@ -6,22 +6,23 @@ import sttp.model.*
 
 import funlearn.model.{ Deck, CardType }
 import funlearn.html
-import funlearn.service
+import funlearn.db
+import funlearn.services.*
 import funlearn.endpoints.Headers
 
 object Headers:
   def hxPushUrl = "HX-Push-Url"
 
-val GET_decks = endpoint
+val decks_GET = endpoint
   .get.in("decks").out(stringBody)
   .out(header(Header.contentType(MediaType.TextHtml)))
   .out(header(Headers.hxPushUrl, "/decks"))
   .handleSuccess:
     _ =>
-      val decks = service.decks.getAllDecks()
+      val decks = db.decks.getAllDecks()
       html.decks(decks).toString
 
-val GET_decks_new = endpoint
+val decks_new_GET = endpoint
   .get.in("decks" / "new").out(stringBody)
   .out(header(Header.contentType(MediaType.TextHtml)))
   .out(header(Headers.hxPushUrl, "/decks/new"))
@@ -29,7 +30,7 @@ val GET_decks_new = endpoint
     _ =>
       html.newDeck().toString
 
-val POST_decks = endpoint
+val decks_POST = endpoint
   .post.in("decks").in(formBody[Seq[(String, String)]])
   .out(header[String](HeaderNames.Location))
   .out(statusCode(StatusCode.SeeOther))
@@ -44,44 +45,33 @@ val POST_decks = endpoint
       val prompts = body.filter(_._1.startsWith("prompts")).map(_._2)
       val schemaModel = keys.zip(prompts).map { case (k, p) => Map("name" -> k, "prompt" -> p) }
 
-      // Schema is a JSON string formed from the keys and prompts
-      val schema = upickle.default.write(schemaModel)
-      val deck = Deck(-1, name, description, schema, labelKey)
-
-      val deckId = service.decks.createDeck(deck)
-      println(s"Deck created, deckId: $deckId")
-
-      // Create the first card type
-      val cardType = CardType(-1, "Default", deckId, "", "")
-      val cardTypeId = service.cardTypes.createCardType(cardType)
-      val newCardType = service.cardTypes.getCardTypeById(cardTypeId)
-      println(s"Card type created: $newCardType")
+      val cardTypeId = IMPL_decks_POST(name, description, labelKey, schemaModel)
 
       // Return the edit page for the new card type, by redirecting the user to page /card_type/{id}/edit
       s"/card_types/$cardTypeId/edit"
 
-val GET_decks_id = endpoint
+val decks_id_GET = endpoint
   .get.in("decks" / path[Long]).out(stringBody)
   .out(header(Header.contentType(MediaType.TextHtml)))
   .out(header[String](Headers.hxPushUrl))
   .handleSuccess:
     (deckId: Long) =>
-      val deck = service.decks.getDeckById(deckId)
-      val cardTypes = service.cardTypes.getCardTypesByDeckId(deckId)
+      val deck = db.decks.getDeckById(deckId)
+      val cardTypes = db.cardTypes.getCardTypesByDeckId(deckId)
       val body = html.deckDetail(deck, cardTypes).toString
       (body, s"/decks/$deckId")
 
-val GET_decks_id_edit = endpoint
+val decks_id_edit_GET = endpoint
   .get.in("decks" / path[Long] / "edit").out(stringBody)
   .out(header(Header.contentType(MediaType.TextHtml)))
   .out(header[String](Headers.hxPushUrl))
   .handleSuccess:
     (deckId: Long) =>
-      val deck = service.decks.getDeckById(deckId)
+      val deck = db.decks.getDeckById(deckId)
       val body = html.editDeck(deck).toString
       (body, s"/decks/$deckId/edit")
 
-val PATCH_decks_id = endpoint
+val decks_id_PATCH = endpoint
   .patch.in("decks" / path[Long]).in(formBody[Seq[(String, String)]])
   .out(header[String](HeaderNames.Location))
   .out(statusCode(StatusCode.SeeOther))
@@ -90,31 +80,31 @@ val PATCH_decks_id = endpoint
       val name = body.find(_._1 == "name").map(_._2).get
       val description = body.find(_._1 == "description").map(_._2).get
 
-      val originalDeck = service.decks.getDeckById(deckId)
+      val originalDeck = db.decks.getDeckById(deckId)
       val updatedDeck = originalDeck.copy(name = name, description = description)
-      service.decks.updateDeck(updatedDeck)
+      db.decks.updateDeck(updatedDeck)
       s"/decks/$deckId"
 
-val DELETE_decks_id = endpoint
+val decks_id_DELETE = endpoint
   .delete.in("decks" / path[Long])
   .out(header[String](HeaderNames.Location))
   .out(statusCode(StatusCode.SeeOther))
   .handleSuccess:
     (deckId: Long) =>
-      service.decks.deleteDeck(deckId)
+      db.decks.deleteDeck(deckId)
       "/decks"
 
-val GET_card_types_id_edit = endpoint
+val card_types_id_edit_GET = endpoint
   .get.in("card_types" / path[Long] / "edit").out(stringBody)
   .out(header(Header.contentType(MediaType.TextHtml)))
   .out(header[String](Headers.hxPushUrl))
   .handleSuccess:
     (cardTypeId: Long) =>
-      val cardType = service.cardTypes.getCardTypeById(cardTypeId)
+      val cardType = db.cardTypes.getCardTypeById(cardTypeId)
       val body = html.upsertCardType(Some(cardType)).toString
       (body, s"/card_types/$cardTypeId/edit")
 
-val PUT_card_types = endpoint
+val card_types_PUT = endpoint
   .put.in("card_types").in(formBody[Seq[(String, String)]])
   .out(header[String](HeaderNames.Location))
   .out(statusCode(StatusCode.SeeOther))
@@ -125,22 +115,22 @@ val PUT_card_types = endpoint
       val frontTml = body.find(_._1 == "front_tml").map(_._2).get
       val backTml = body.find(_._1 == "back_tml").map(_._2).get
 
-      val originalCardType = service.cardTypes.getCardTypeById(id)
+      val originalCardType = db.cardTypes.getCardTypeById(id)
       val newCardType = originalCardType.copy(name = name, frontTml = frontTml, backTml = backTml)
-      service.cardTypes.updateCardType(newCardType)
+      db.cardTypes.updateCardType(newCardType)
       s"/card_types/"
 
-val GET_card_types_id = endpoint
+val card_types_id_GET = endpoint
   .get.in("card_types" / path[Long]).out(stringBody)
   .out(header(Header.contentType(MediaType.TextHtml)))
   .out(header[String](Headers.hxPushUrl))
   .handleSuccess:
     (cardTypeId: Long) =>
-      val cardType = service.cardTypes.getCardTypeById(cardTypeId)
+      val cardType = db.cardTypes.getCardTypeById(cardTypeId)
       val body = html.cardTypeDetail(cardType).toString
       (body, s"/card_types/$cardTypeId")
 
-val GET_card_types_new = endpoint
+val card_types_new_GET = endpoint
   .get.in("card_types" / "new").in(query[Long]("deck")).out(stringBody)
   .out(header(Header.contentType(MediaType.TextHtml)))
   .out(header[String](Headers.hxPushUrl))
@@ -149,7 +139,7 @@ val GET_card_types_new = endpoint
       val body = html.upsertCardType(None, Some(deckId)).toString
       (body, s"/card_types/new?deck=$deckId")
 
-val POST_card_types = endpoint
+val card_types_POST = endpoint
   .post.in("card_types").in(formBody[Seq[(String, String)]])
   .out(header[String](HeaderNames.Location))
   .out(statusCode(StatusCode.SeeOther))
@@ -161,15 +151,15 @@ val POST_card_types = endpoint
       val backTml = body.find(_._1 == "back_tml").map(_._2).get
 
       val cardType = CardType(-1, name, deckId, frontTml, backTml)
-      val cardTypeId = service.cardTypes.createCardType(cardType)
+      val cardTypeId = db.cardTypes.createCardType(cardType)
       s"/card_types/$cardTypeId"
 
-val DELETE_card_types_id = endpoint
+val card_types_id_DELETE = endpoint
   .delete.in("card_types" / path[Long])
   .out(header[String](HeaderNames.Location))
   .out(statusCode(StatusCode.SeeOther))
   .handleSuccess:
     (cardTypeId: Long) =>
-      val cardType = service.cardTypes.getCardTypeById(cardTypeId)
-      service.cardTypes.deleteCardType(cardTypeId)
+      val cardType = db.cardTypes.getCardTypeById(cardTypeId)
+      db.cardTypes.deleteCardType(cardTypeId)
       s"/decks/${cardType.deckId}"

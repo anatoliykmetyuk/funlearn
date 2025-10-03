@@ -18,19 +18,19 @@ object Main extends OxApp:
       .port(8080)
       .addEndpoint(staticFilesGetServerEndpoint("static")("../static"))
       .addEndpoints(List(
-        GET_decks,
-        GET_decks_new,
-        POST_decks,
-        GET_decks_id,
-        GET_decks_id_edit,
-        PATCH_decks_id,
-        DELETE_decks_id,
-        GET_card_types_id_edit,
-        PUT_card_types,
-        GET_card_types_new,
-        GET_card_types_id,
-        POST_card_types,
-        DELETE_card_types_id,
+        decks_new_GET,
+        decks_GET,
+        decks_POST,
+        decks_id_edit_GET,
+        decks_id_GET,
+        decks_id_PATCH,
+        decks_id_DELETE,
+        card_types_new_GET,
+        card_types_id_edit_GET,
+        card_types_id_GET,
+        card_types_id_DELETE,
+        card_types_PUT,
+        card_types_POST,
       ))
       .startAndWait()
     ExitCode.Success
