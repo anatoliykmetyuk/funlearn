@@ -5,7 +5,7 @@ import scalatags.Text.tags2.{ title as _, attr as _, * }
 
 import funlearn.model.Deck
 
-def HTML_decks(decks: List[Deck]) = layout("Decks")(
+def HTML_decks(decks: Seq[Deck]) = layout("Decks")(
   main(
     // Deck buttons
     section(`class` := "grid")(

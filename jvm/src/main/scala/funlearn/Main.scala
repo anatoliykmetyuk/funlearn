@@ -7,7 +7,6 @@ import sttp.tapir.server.netty.sync.NettySyncServer
 
 import funlearn.html
 import funlearn.endpoints.*
-import funlearn.model.Card
 import funlearn.model.Deck
 
 object Main extends OxApp:

@@ -1,7 +1,7 @@
 package funlearn.services
 
 import funlearn.model.{ Deck, CardType }
-import funlearn.db
+import funlearn.db.{decksRepo, cardTypesRepo}
 
 
 object IMPL_decks_POST:
@@ -26,14 +26,12 @@ object IMPL_decks_POST:
     val schema = upickle.default.write(schemaModel)
     val deck = Deck(-1, name, description, schema, labelKey)
 
-    val deckId = db.decks.createDeck(deck)
+    val deckId = decksRepo.insertReturning(deck).id
     println(s"Deck created, deckId: $deckId")
 
     // Create the first card type
     val cardType = CardType(-1, "Default", deckId, "", "")
-    val cardTypeId = db.cardTypes.createCardType(cardType)
-    val newCardType = db.cardTypes.getCardTypeById(cardTypeId)
-    println(s"Card type created: $newCardType")
+    val cardTypeId = cardTypesRepo.insertReturning(cardType).id
 
     cardTypeId
   end impl

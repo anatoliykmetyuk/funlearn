@@ -7,7 +7,7 @@ import sttp.model.*
 import funlearn.model.{ Deck, CardType }
 import funlearn.html.*
 import funlearn.services.*
-import funlearn.db
+import funlearn.db.{decksRepo, cardTypesRepo}
 import funlearn.endpoints.Headers
 
 object Headers:
@@ -19,7 +19,7 @@ val decks_GET = endpoint
   .out(header(Headers.hxPushUrl, "/decks"))
   .handleSuccess:
     _ =>
-      val decks = db.decks.getAllDecks()
+      val decks = decksRepo.findAll()
       HTML_decks(decks).toString
 
 val decks_new_GET = endpoint
@@ -46,8 +46,8 @@ val decks_id_GET = endpoint
   .out(header[String](Headers.hxPushUrl))
   .handleSuccess:
     (deckId: Long) =>
-      val deck = db.decks.getDeckById(deckId)
-      val cardTypes = db.cardTypes.getCardTypesByDeckId(deckId)
+      val deck = decksRepo.findById(deckId).get
+      val cardTypes = cardTypesRepo.getCardTypesByDeckId(deckId)
       val body = HTML_decks_id(deck, cardTypes).toString
       (body, s"/decks/$deckId")
 
@@ -57,7 +57,7 @@ val decks_id_edit_GET = endpoint
   .out(header[String](Headers.hxPushUrl))
   .handleSuccess:
     (deckId: Long) =>
-      val deck = db.decks.getDeckById(deckId)
+      val deck = decksRepo.findById(deckId).get
       val body = HTML_decks_id_edit(deck).toString
       (body, s"/decks/$deckId/edit")
 
@@ -70,9 +70,9 @@ val decks_id_PATCH = endpoint
       val name = body.find(_._1 == "name").map(_._2).get
       val description = body.find(_._1 == "description").map(_._2).get
 
-      val originalDeck = db.decks.getDeckById(deckId)
+      val originalDeck = decksRepo.findById(deckId).get
       val updatedDeck = originalDeck.copy(name = name, description = description)
-      db.decks.updateDeck(updatedDeck)
+      decksRepo.update(updatedDeck)
       s"/decks/$deckId"
 
 val decks_id_DELETE = endpoint
@@ -81,7 +81,7 @@ val decks_id_DELETE = endpoint
   .out(statusCode(StatusCode.SeeOther))
   .handleSuccess:
     (deckId: Long) =>
-      db.decks.deleteDeck(deckId)
+      decksRepo.deleteById(deckId)
       "/decks"
 
 val cardTypes_id_edit_GET = endpoint
@@ -90,7 +90,7 @@ val cardTypes_id_edit_GET = endpoint
   .out(header[String](Headers.hxPushUrl))
   .handleSuccess:
     (cardTypeId: Long) =>
-      val cardType = db.cardTypes.getCardTypeById(cardTypeId)
+      val cardType = cardTypesRepo.findById(cardTypeId).get
       val body = HTML_cardTypes_id_edit(cardType).toString
       (body, s"/card_types/$cardTypeId/edit")
 
@@ -105,9 +105,9 @@ val cardTypes_PUT = endpoint
       val frontTml = body.find(_._1 == "front_tml").map(_._2).get
       val backTml = body.find(_._1 == "back_tml").map(_._2).get
 
-      val originalCardType = db.cardTypes.getCardTypeById(id)
+      val originalCardType = cardTypesRepo.findById(id).get
       val newCardType = originalCardType.copy(name = name, frontTml = frontTml, backTml = backTml)
-      db.cardTypes.updateCardType(newCardType)
+      cardTypesRepo.update(newCardType)
       s"/card_types/"
 
 val cardTypes_id_GET = endpoint
@@ -116,7 +116,7 @@ val cardTypes_id_GET = endpoint
   .out(header[String](Headers.hxPushUrl))
   .handleSuccess:
     (cardTypeId: Long) =>
-      val cardType = db.cardTypes.getCardTypeById(cardTypeId)
+      val cardType = cardTypesRepo.findById(cardTypeId).get
       val body = HTML_cardTypes_id(cardType).toString
       (body, s"/card_types/$cardTypeId")
 
@@ -141,7 +141,8 @@ val cardTypes_POST = endpoint
       val backTml = body.find(_._1 == "back_tml").map(_._2).get
 
       val cardType = CardType(-1, name, deckId, frontTml, backTml)
-      val cardTypeId = db.cardTypes.createCardType(cardType)
+      val createdCardType = cardTypesRepo.insertReturning(cardType)
+      val cardTypeId = createdCardType.id
       s"/card_types/$cardTypeId"
 
 val cardTypes_id_DELETE = endpoint
@@ -150,6 +151,6 @@ val cardTypes_id_DELETE = endpoint
   .out(statusCode(StatusCode.SeeOther))
   .handleSuccess:
     (cardTypeId: Long) =>
-      val cardType = db.cardTypes.getCardTypeById(cardTypeId)
-      db.cardTypes.deleteCardType(cardTypeId)
+      val cardType = cardTypesRepo.findById(cardTypeId).get
+      cardTypesRepo.deleteById(cardTypeId)
       s"/decks/${cardType.deckId}"

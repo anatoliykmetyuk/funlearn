@@ -5,7 +5,7 @@ import scalatags.Text.all.*
 import scalatags.Text.tags2.{ title as _, attr as _, * }
 
 
-def HTML_decks_id(deck: Deck, cardTypes: List[CardType]) = layout(s"Deck: ${deck.name}")(
+def HTML_decks_id(deck: Deck, cardTypes: Seq[CardType]) = layout(s"Deck: ${deck.name}")(
   main(
     // Navigation
     section(

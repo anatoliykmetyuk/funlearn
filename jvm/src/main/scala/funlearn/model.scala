@@ -1,17 +1,19 @@
 package funlearn.model
 
-case class Card(front: String, back: String)
+import com.augustnagro.magnum.*
 
+@Table(SqliteDbType, SqlNameMapper.CamelToSnakeCase)
 case class Deck(
-  id: Long,
+  @Id id: Long,
   name: String,
   description: String,
   schema: String, // JSON string
   recordNameKey: String
 )
 
+@Table(SqliteDbType, SqlNameMapper.CamelToSnakeCase)
 case class CardType(
-  id: Long,
+  @Id id: Long,
   name: String,
   deckId: Long,
   frontTml: String,
