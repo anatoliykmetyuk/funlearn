@@ -2,7 +2,6 @@ package funlearn.html
 
 import scalatags.Text.all.*
 import scalatags.Text.tags2.{ title as titleTag, attr as _, * }
-import funlearn.model.Card
 
 object hx:
   def get = attr("hx-get")
@@ -37,42 +36,3 @@ def layout(pageTitle: String)(payload: Frag*) =
       payload
     )
   )
-
-def session(currentCard: Card, remainingCards: Int) = layout("Session")(
-  header(
-    p(id := "session-status")(s"${remainingCards} cards remaining")
-  ),
-
-  main(
-    article(id := "card-front", `class` := "card")(
-      h1(currentCard.front)
-    ),
-
-    article(id := "card-back", `class` := "card", hidden)(
-      h1(currentCard.back),
-    )
-  ),
-
-  section(`class` := "grid")(
-    button(
-      hx.post := "/session/lapse",
-      hx.target := "body"
-    )("Lapse"),
-    button(
-      hx.post := "/session/pass",
-      hx.target := "body"
-    )("Pass")
-  ),
-
-  section(`class` := "")(
-    button(onclick := """
-      document.getElementById('card-back').hidden = false;
-      this.hidden = true;
-    """)("Reveal")
-  )
-)
-
-def congratulations() = article(
-  h1("Congratulations!"),
-  p("You have completed all the cards.")
-)
