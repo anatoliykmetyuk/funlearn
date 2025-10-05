@@ -5,9 +5,9 @@ import sttp.tapir.files.*
 import sttp.model.*
 
 import funlearn.model.{ Deck, CardType }
-import funlearn.html
-import funlearn.db
+import funlearn.html.*
 import funlearn.services.*
+import funlearn.db
 import funlearn.endpoints.Headers
 
 object Headers:
@@ -20,7 +20,7 @@ val decks_GET = endpoint
   .handleSuccess:
     _ =>
       val decks = db.decks.getAllDecks()
-      html.decks(decks).toString
+      HTML_decks(decks).toString
 
 val decks_new_GET = endpoint
   .get.in("decks" / "new").out(stringBody)
@@ -28,7 +28,7 @@ val decks_new_GET = endpoint
   .out(header(Headers.hxPushUrl, "/decks/new"))
   .handleSuccess:
     _ =>
-      html.newDeck().toString
+      HTML_decks_new().toString
 
 val decks_POST = endpoint
   .post.in("decks").in(formBody[Seq[(String, String)]])
@@ -48,7 +48,7 @@ val decks_id_GET = endpoint
     (deckId: Long) =>
       val deck = db.decks.getDeckById(deckId)
       val cardTypes = db.cardTypes.getCardTypesByDeckId(deckId)
-      val body = html.deckDetail(deck, cardTypes).toString
+      val body = HTML_decks_id(deck, cardTypes).toString
       (body, s"/decks/$deckId")
 
 val decks_id_edit_GET = endpoint
@@ -58,7 +58,7 @@ val decks_id_edit_GET = endpoint
   .handleSuccess:
     (deckId: Long) =>
       val deck = db.decks.getDeckById(deckId)
-      val body = html.editDeck(deck).toString
+      val body = HTML_decks_id_edit(deck).toString
       (body, s"/decks/$deckId/edit")
 
 val decks_id_PATCH = endpoint
@@ -84,17 +84,17 @@ val decks_id_DELETE = endpoint
       db.decks.deleteDeck(deckId)
       "/decks"
 
-val card_types_id_edit_GET = endpoint
+val cardTypes_id_edit_GET = endpoint
   .get.in("card_types" / path[Long] / "edit").out(stringBody)
   .out(header(Header.contentType(MediaType.TextHtml)))
   .out(header[String](Headers.hxPushUrl))
   .handleSuccess:
     (cardTypeId: Long) =>
       val cardType = db.cardTypes.getCardTypeById(cardTypeId)
-      val body = html.upsertCardType(Some(cardType)).toString
+      val body = HTML_cardTypes_id_edit(cardType).toString
       (body, s"/card_types/$cardTypeId/edit")
 
-val card_types_PUT = endpoint
+val cardTypes_PUT = endpoint
   .put.in("card_types").in(formBody[Seq[(String, String)]])
   .out(header[String](HeaderNames.Location))
   .out(statusCode(StatusCode.SeeOther))
@@ -110,26 +110,26 @@ val card_types_PUT = endpoint
       db.cardTypes.updateCardType(newCardType)
       s"/card_types/"
 
-val card_types_id_GET = endpoint
+val cardTypes_id_GET = endpoint
   .get.in("card_types" / path[Long]).out(stringBody)
   .out(header(Header.contentType(MediaType.TextHtml)))
   .out(header[String](Headers.hxPushUrl))
   .handleSuccess:
     (cardTypeId: Long) =>
       val cardType = db.cardTypes.getCardTypeById(cardTypeId)
-      val body = html.cardTypeDetail(cardType).toString
+      val body = HTML_cardTypes_id(cardType).toString
       (body, s"/card_types/$cardTypeId")
 
-val card_types_new_GET = endpoint
+val cardTypes_new_GET = endpoint
   .get.in("card_types" / "new").in(query[Long]("deck")).out(stringBody)
   .out(header(Header.contentType(MediaType.TextHtml)))
   .out(header[String](Headers.hxPushUrl))
   .handleSuccess:
     (deckId: Long) =>
-      val body = html.upsertCardType(None, Some(deckId)).toString
+      val body = HTML_cardTypes_new(deckId).toString
       (body, s"/card_types/new?deck=$deckId")
 
-val card_types_POST = endpoint
+val cardTypes_POST = endpoint
   .post.in("card_types").in(formBody[Seq[(String, String)]])
   .out(header[String](HeaderNames.Location))
   .out(statusCode(StatusCode.SeeOther))
@@ -144,7 +144,7 @@ val card_types_POST = endpoint
       val cardTypeId = db.cardTypes.createCardType(cardType)
       s"/card_types/$cardTypeId"
 
-val card_types_id_DELETE = endpoint
+val cardTypes_id_DELETE = endpoint
   .delete.in("card_types" / path[Long])
   .out(header[String](HeaderNames.Location))
   .out(statusCode(StatusCode.SeeOther))

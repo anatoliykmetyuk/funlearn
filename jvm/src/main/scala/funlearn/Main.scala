@@ -25,12 +25,12 @@ object Main extends OxApp:
         decks_id_GET,
         decks_id_PATCH,
         decks_id_DELETE,
-        card_types_new_GET,
-        card_types_id_edit_GET,
-        card_types_id_GET,
-        card_types_id_DELETE,
-        card_types_PUT,
-        card_types_POST,
+        cardTypes_new_GET,
+        cardTypes_id_edit_GET,
+        cardTypes_id_GET,
+        cardTypes_id_DELETE,
+        cardTypes_PUT,
+        cardTypes_POST,
       ))
       .startAndWait()
     ExitCode.Success
