@@ -3,27 +3,31 @@ package funlearn
 import scala.scalajs.js.annotation.JSExportTopLevel
 import org.scalajs.dom
 import org.scalajs.dom.{ HTMLElement, Event }
+import typings.jquery.{ mod as jq }
+import typings.jquery.JQuery
 
 
 @JSExportTopLevel("decks_new_JS")
 object decks_new_JS:
   def addCardField(): Unit =
     val uid = System.currentTimeMillis()
-    val cardTypeFields = dom.document.querySelector(".card-type-fields")
+    val cardTypeFields = jq(".card-type-fields")
 
     /* Clone the template #card-type-field-template, append the cloned item to the template's parent */
-    val template = dom.document.querySelector("#card-type-field-template")
-    val newField = template.cloneNode(true).asInstanceOf[HTMLElement]
-    newField.id = s"card-type-field-$uid"
+    // val template = dom.document.querySelector("#card-type-field-template")
+    // And in jquery...
+    val template = jq("#card-type-field-template")
+    val newField = template.clone(true, true).asInstanceOf[JQuery[HTMLElement]]
 
-    newField.querySelector("input[name='keys[0]']").name = s"keys[$uid]"
-    newField.querySelector("input[name='prompts[0]']").name = s"prompts[$uid]"
-    newField.querySelector("input[name='label_key']").name = s"label_key[$uid]"
-    newField.querySelector("button").addEventListener("click", removeCardField)
+    newField.find("input[name='keys[0]']").attr("name", s"keys[$uid]")
+    newField.find("input[name='prompts[0]']").attr("name", s"prompts[$uid]")
+    newField.find("input[name='label_key']").attr("name", s"label_key[$uid]")
 
-    cardTypeFields.appendChild(newField)
+    val removeBtn = newField.find("button")
+    removeBtn.on("click", removeCardField(removeBtn, _))
 
-  def removeCardField(btn: HTMLElement): Unit =
-    val cardTypeField = btn.closest(".card-type-field")
-    val cardTypeFields = cardTypeField.parentNode
-    cardTypeFields.removeChild(cardTypeField)
+    cardTypeFields.appendTo(newField)
+  end addCardField
+
+  def removeCardField(btn: typings.jquery.JQuery[Nothing], evt: typings.jquery.JQueryEventObject): Unit =
+    btn.closest(".card-type-field").remove()
